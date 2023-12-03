@@ -6,10 +6,7 @@ import entities.Department;
 import entities.Seller;
 import model.dao.SellerDao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +20,41 @@ public class SellerDaoJDBC implements SellerDao {
         this.connection = connection;
     }
     @Override
-    public void insert(Seller department) {
+    public void insert(Seller seller) {
 
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(
+                    "INSERT INTO seller "
+                    + "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+                    + "VALUES "
+                    + "(?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, seller.getName());
+            preparedStatement.setString(2, seller.getEmail());
+            preparedStatement.setDate(3, new Date(seller.getBirthDate().getTime()));
+            preparedStatement.setDouble(4, seller.getBaseSalary());
+            preparedStatement.setInt(5, seller.getDepartment().getId());
+
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows>0) {
+                ResultSet resultSet = preparedStatement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    int id = resultSet.getInt(1);
+                    seller.setId(id);
+                }
+                DB.closeResulSet(resultSet);
+            } else {
+                throw new DbException("Erro inesperado");
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(preparedStatement);
+        }
     }
 
     @Override
@@ -68,7 +98,7 @@ public class SellerDaoJDBC implements SellerDao {
 
         } finally {
             DB.closeStatement(preparedStatement);
-            DB.claseResulSet(resultSet);
+            DB.closeResulSet(resultSet);
         }
     }
 
@@ -129,7 +159,7 @@ public class SellerDaoJDBC implements SellerDao {
             throw new DbException(e.getMessage());
         } finally {
             DB.closeStatement(preparedStatement);
-            DB.claseResulSet(resultSet);
+            DB.closeResulSet(resultSet);
         }
     }
 
@@ -172,7 +202,7 @@ public class SellerDaoJDBC implements SellerDao {
             throw new DbException(e.getMessage());
         } finally {
             DB.closeStatement(preparedStatement);
-            DB.claseResulSet(resultSet);
+            DB.closeResulSet(resultSet);
         }
     }
 }

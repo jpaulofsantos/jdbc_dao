@@ -14,9 +14,9 @@ import java.util.List;
 public class MainProgram {
 
     //steps
-    //1-criar a base para conexão com banco de dados (properties, classes)
+    //1-criar a base para conexão com banco de dados (properties, classes DB)
     //2-criar as entities (objetos que irão representar os resultados obtidos do banco)
-    //3-criar as interfaces com os métodos de acesso ao banco de dados
+    //3-criar as interfaces com os métodos de acesso ao banco de dados e o DaoFactory que irá passar o Connection e instanciar as classes que implementam as interfaces
     //4-criar as classes que irão implementar  os métodos das interfaces
 
     public static void main(String[] args) {
@@ -48,6 +48,17 @@ public class MainProgram {
         List<Department> departmentListAll = departmentDao.findAll();
         departmentListAll.forEach(System.out::println);
 
+        System.out.println("");
+        System.out.println("---TEST Seller Insert---");
 
+        Seller seller = new Seller();
+        seller.setName("JP3");
+        seller.setEmail("jp3@teste.com.br");
+        seller.setBirthDate(new Date());
+        seller.setBaseSalary(3000.00);
+        seller.setDepartment(departmentDao.findById(3));
+
+        sellerDao.insert(seller);
+        System.out.println("Insert ok! ID: " + seller.getId());
     }
 }

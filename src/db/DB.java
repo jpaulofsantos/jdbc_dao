@@ -54,7 +54,7 @@ public class DB {
         }
     }
 
-    public static void claseResulSet(ResultSet resultSet) {
+    public static void closeResulSet(ResultSet resultSet) {
         if (resultSet!=null) {
             try {
                 resultSet.close();
