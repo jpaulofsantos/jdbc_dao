@@ -10,7 +10,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SellerDaoJDBC implements SellerDao {
 
@@ -94,5 +97,49 @@ public class SellerDaoJDBC implements SellerDao {
     @Override
     public List<Seller> findAll() {
         return null;
+    }
+
+    @Override
+    public List<Seller> findByDepartment(Department department) {
+
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        int rows = 0;
+
+        try {
+            preparedStatement = connection.prepareStatement(
+                    "SELECT seller .*, department.Name as DepName, department.Id as DepId "
+                            + "FROM seller INNER JOIN department "
+                            + "ON seller.DepartmentId = department.Id "
+                            + "WHERE department.Id = ? "
+                            + "ORDER BY Name ");
+
+            preparedStatement.setInt(1, department.getId());
+
+            resultSet = preparedStatement.executeQuery();
+
+            List<Seller> sellerList = new ArrayList<>();
+            Map<Integer, Department> departmentMap = new HashMap<>(); //map para não repetir o departamento, ou seja: os vendedores estarão apontando para o mesmo objeto department, e não serão criados departments repetidos.
+
+            while (resultSet.next()) {
+
+                    Department dep = departmentMap.get(resultSet.getInt("DepartmentId")); //verifica se já existe o valor no map, passando o Id da coluna informada
+
+                    if (dep == null) { //se não existir
+                        dep = instantiateDepartment(resultSet); //cria um novo departamento
+                        departmentMap.put(resultSet.getInt("DepartmentId"), dep); //add no map
+                    }
+
+                    Seller seller = instantianteSeller(resultSet, dep);
+                    sellerList.add(seller);
+            }
+            return sellerList;
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(preparedStatement);
+            DB.claseResulSet(resultSet);
+        }
     }
 }
