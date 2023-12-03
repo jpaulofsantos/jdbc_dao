@@ -36,6 +36,12 @@ public class MainProgram {
         List<Seller> sellerList = sellerDao.findByDepartment(departmentDao.findById(2));
         sellerList.forEach(System.out::println);
 
+        System.out.println("");
+        System.out.println("---TEST Seller All---");
+
+        List<Seller> sellerListAll = sellerDao.findAll();
+        sellerListAll.forEach(System.out::println);
+
 
     }
 }

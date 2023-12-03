@@ -43,11 +43,11 @@ public class SellerDaoJDBC implements SellerDao {
         ResultSet resultSet = null;
 
         try {
-            preparedStatement = connection.prepareStatement(
+            preparedStatement = connection.prepareStatement(//sql que busca um vendedor no banco de dados através do ID
                     "SELECT seller .*, department.Name as DepName, department.Id as DepId "
                     + "FROM seller INNER JOIN department "
                     + "ON seller.DepartmentId = department.Id "
-                    + "WHERE seller.Id = ?");  //sql que busca um vendedor no banco de dados através do ID
+                    + "WHERE seller.Id = ?");
 
             preparedStatement.setInt(1, id); //id recebido da função, se refere ao ? da query acima
 
@@ -96,7 +96,41 @@ public class SellerDaoJDBC implements SellerDao {
 
     @Override
     public List<Seller> findAll() {
-        return null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(
+                    "SELECT seller .*, department.Name as DepName, department.Id as DepId "
+                            + "FROM seller INNER JOIN department "
+                            + "ON seller.DepartmentId = department.Id "
+                            + "ORDER BY Id ");
+
+            resultSet = preparedStatement.executeQuery();
+
+            List<Seller> sellerList = new ArrayList<>();
+            Map<Integer, Department> departmentMap = new HashMap<>(); //map para não repetir o departamento, ou seja: os vendedores estarão apontando para o mesmo objeto department, e não serão criados departments repetidos.
+
+            while (resultSet.next()) {
+
+                Department dep = departmentMap.get(resultSet.getInt("DepartmentId")); //verifica se já existe o valor no map, passando o Id da coluna informada
+
+                if (dep == null) { //se não existir
+                    dep = instantiateDepartment(resultSet); //cria um novo departamento
+                    departmentMap.put(resultSet.getInt("DepartmentId"), dep); //add no map
+                }
+
+                Seller seller = instantianteSeller(resultSet, dep);
+                sellerList.add(seller);
+            }
+            return sellerList;
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(preparedStatement);
+            DB.claseResulSet(resultSet);
+        }
     }
 
     @Override
@@ -104,7 +138,6 @@ public class SellerDaoJDBC implements SellerDao {
 
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        int rows = 0;
 
         try {
             preparedStatement = connection.prepareStatement(
