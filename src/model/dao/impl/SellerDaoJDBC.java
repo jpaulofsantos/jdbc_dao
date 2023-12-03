@@ -52,19 +52,10 @@ public class SellerDaoJDBC implements SellerDao {
 
             if (resultSet.next()) { //testando se veio algum resultado, pois o resultSet aponta para a posição 0 e o objeto está na posição 1
 
-                Department department = new Department(); //instanciando um Department e setando os valores a partir dos resultados do resultSet
-                department.setId(resultSet.getInt("DepartmentId"));
-                department.setName(resultSet.getString("DepName"));
+                Department department = instantiateDepartment(resultSet);
 
-                Seller seller = new Seller(); //instanciando um Seller e setando os valores a partir dos resultados do resultSet
-                seller.setId(resultSet.getInt("Id"));
-                seller.setName(resultSet.getString("Name"));
-                seller.setEmail(resultSet.getString("Email"));
-                seller.setBirthDate(resultSet.getDate("BirthDate"));
-                seller.setBaseSalary(resultSet.getDouble("BaseSalary"));
-                seller.setDepartment(department);
+                return instantianteSeller(resultSet, department);
 
-                return seller;
             }
 
             return null;
@@ -76,6 +67,28 @@ public class SellerDaoJDBC implements SellerDao {
             DB.closeStatement(preparedStatement);
             DB.claseResulSet(resultSet);
         }
+    }
+
+    private Seller instantianteSeller(ResultSet resultSet, Department department) throws SQLException {
+
+        Seller seller =  new Seller(); //instanciando um Seller e setando os valores a partir dos resultados do resultSet
+        seller.setId(resultSet.getInt("Id"));
+        seller.setName(resultSet.getString("Name"));
+        seller.setEmail(resultSet.getString("Email"));
+        seller.setBirthDate(resultSet.getDate("BirthDate"));
+        seller.setBaseSalary(resultSet.getDouble("BaseSalary"));
+        seller.setDepartment(department);
+
+        return seller;
+    }
+
+    private Department instantiateDepartment(ResultSet resultSet) throws SQLException {
+
+        Department department = new Department(); //instanciando um Department e setando os valores a partir dos resultados do resultSet
+        department.setId(resultSet.getInt("DepartmentId"));
+        department.setName(resultSet.getString("DepName"));
+
+        return department;
     }
 
     @Override

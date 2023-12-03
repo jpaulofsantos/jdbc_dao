@@ -17,11 +17,12 @@ public class MainProgram {
 
     public static void main(String[] args) {
 
-        Connection connection = null;
-
+        System.out.println("---TEST Seller by ID 2---");
         SellerDao sellerDao = DaoFactory.createSellerDao(); //o programa não conhece a implementação, somente a interface. É tbm uma forma de se fazer injeção de dep sem explicitar a implementação
         System.out.println(sellerDao.findById(2));
+        System.out.println("");
 
+        System.out.println("---TEST Department by ID 1---");
         DepartmentDao departmentDao = DaoFactory.createDepartmentDao();
         System.out.println(departmentDao.findById(1));
 
