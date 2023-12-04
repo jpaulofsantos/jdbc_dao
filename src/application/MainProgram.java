@@ -58,8 +58,8 @@ public class MainProgram {
         seller.setBaseSalary(3000.00);
         seller.setDepartment(departmentDao.findById(3));
 
-        sellerDao.insert(seller);
-        System.out.println("Insert ok! ID: " + seller.getId());
+        //sellerDao.insert(seller);
+        //System.out.println("Insert ok! ID: " + seller.getId());
 
         System.out.println("");
         System.out.println("---TEST Seller Update---");
@@ -68,5 +68,10 @@ public class MainProgram {
         seller.setName("Teste");
         sellerDao.update(seller);
         System.out.println("Update ok!");
+
+        System.out.println("");
+        System.out.println("---TEST Seller Delete---");
+
+        sellerDao.deleteById(29);
     }
 }
